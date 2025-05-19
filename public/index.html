@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Editar Pedido</title>
+</head>
+<body>
+  <h2>Editar Pedido</h2>
+  <form id="editForm">
+    <label for="id">ID del Pedido:</label>
+    <input type="text" id="id" required /><br /><br />
+
+    <label for="producto">Producto:</label>
+    <input type="text" id="producto" required /><br /><br />
+
+    <label for="cantidad">Cantidad:</label>
+    <input type="number" id="cantidad" required /><br /><br />
+
+    <label for="cliente">Cliente:</label>
+    <input type="text" id="cliente" required /><br /><br />
+
+    <button type="submit">Actualizar</button>
+  </form>
+
+  <div id="resultado"></div>
+
+  <script>
+    const form = document.getElementById('editForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('id').value;
+      const producto = document.getElementById('producto').value;
+      const cantidad = document.getElementById('cantidad').value;
+      const cliente = document.getElementById('cliente').value;
+
+      try {
+        const response = await fetch(`/api/pedidos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ producto, cantidad, cliente })
+        });
+        const result = await response.json();
+        document.getElementById('resultado').textContent =
+          response.ok ? 'Pedido actualizado correctamente' : JSON.stringify(result);
+      } catch (err) {
+        document.getElementById('resultado').textContent = 'Error en la solicitud';
+      }
+    });
+  </script>
+</body>
+</html>
