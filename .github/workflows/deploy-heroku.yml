@@ -1,4 +1,4 @@
-name: Deploy to Heroku
+name: Deploy microservicio a Heroku
 
 on:
   push:
@@ -10,38 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Test (opcional)
-        run: echo "Aquí puedes poner npm test si deseas"
-
-      - name: Install Heroku CLI
+      - name: Instalar Heroku CLI
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh
 
-      - name: Login to Heroku Container Registry
+      - name: Autenticarse en Heroku
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          echo $HEROKU_API_KEY | heroku auth:token
-          echo $HEROKU_API_KEY | docker login --username=_ --password-stdin registry.heroku.com
+          heroku auth:token
+          heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
 
-      - name: Build Docker image
-        run: docker build -t registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web .
-
-      - name: Push Docker image to Heroku
-        run: docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
-
-      - name: Release the app on Heroku
+      - name: Desplegar a Heroku con Git
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "GitHub Actions"
+          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+          git push heroku HEAD:main --force
