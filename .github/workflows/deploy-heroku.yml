@@ -1,4 +1,4 @@
-name: Deploy microservicio a Heroku
+name: Deploy to Heroku
 
 on:
   push:
@@ -10,26 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
+      - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # 👈 evita el problema del shallow clone
 
-      - name: Instalar Heroku CLI
-        run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Autenticarse en Heroku
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          heroku auth:token
-          heroku git:remote -a ${{ secrets.HEROKU_APP_NAME }}
-
-      - name: Desplegar a Heroku con Git
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      - name: Configurar Git
         run: |
           git config --global user.email "you@example.com"
           git config --global user.name "GitHub Actions"
-          git remote remove heroku || true  # 👈 elimina si ya existe
+          git remote remove heroku || true
           git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
-          git push heroku HEAD:main --force
+
+      - name: Push a Heroku
+        run: git push heroku HEAD:main --force
