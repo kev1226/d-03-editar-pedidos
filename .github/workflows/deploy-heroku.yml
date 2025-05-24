@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # necesario para que Heroku reciba todo el historial
+          fetch-depth: 0  # necesario para que Heroku reciba todo el historial 
 
       - name: Set up Git and Heroku remote
         run: |
