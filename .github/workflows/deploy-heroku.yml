@@ -1,0 +1,31 @@
+name: Deploy to Heroku
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # necesario para que Heroku reciba todo el historial
+
+      - name: Set up Git and Heroku remote
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "GitHub Actions"
+          git remote remove heroku || true
+          git remote add heroku https://heroku:${{ secrets.HEROKU_API_KEY }}@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+
+      - name: Push to Heroku
+        if: ${{ github.event_name == 'push' }}
+        run: git push heroku HEAD:main --force

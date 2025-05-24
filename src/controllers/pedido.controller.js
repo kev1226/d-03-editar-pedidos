@@ -8,6 +8,8 @@ exports.actualizarPedido = async (req, res) => {
     }
     res.json(pedidoActualizado);
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar pedido', error });
+    console.error("Error al actualizar el pedido:", error);
+    res.status(500).json({ mensaje: 'Error al actualizar pedido', error: error.message });
   }
+
 };
